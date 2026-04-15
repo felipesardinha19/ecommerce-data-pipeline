@@ -7,14 +7,14 @@ from src.utils.get_latest_file import get_latest_file
 logger = get_logger("metrics")
 ANALYTICS_PATH = Path("data/analytics")
 
-def load_latest_trusted_file():
+def load_latest_parquet_file():
     latest_file = get_latest_file(Path("data/trusted"), "*.parquet")
     if not latest_file:
         logger.warning("Nenhum arquivo encontrado.")
         return None
     return latest_file
 
-file = load_latest_trusted_file()
+file = load_latest_parquet_file()
 
 def average_price_category(file):
     try:
@@ -36,7 +36,7 @@ def average_price_category(file):
         return df
     
     except Exception as e:
-        logger.exception("Erro ao calcular a média de preço por categoria.")
+        logger.exception("Erro ao calcular a média de preço por categoria: {e}.")
         return None
     
 def price_min_max_category(file):
@@ -86,7 +86,7 @@ def price_discount_percentage(file):
         return None
 
 if __name__ == "__main__":
-    file = load_latest_trusted_file()
+    file = load_latest_parquet_file()
 
     if file is not None:
         average_price_category(file)

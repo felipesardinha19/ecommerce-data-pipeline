@@ -1,24 +1,41 @@
 import pandas as pd
 from pathlib import Path
 from datetime import datetime
+from src.utils.logger import get_logger
+from src.utils.get_latest_file import get_latest_file
 
-def get_latest_raw_file():
-    pasta = Path('C:\\Users\\felip\\OneDrive\\Documentos\\Data_Pipeline_Ecommerce\\data\\raw')   
+logger = get_logger("transform")
+TRUSTED_PATH = Path("data/trusted")
+
+def transform_data():
+    try:
+
+        latest_file = get_latest_file(Path("data/raw"), "*.json")
+        
+        if not latest_file:
+            logger.warning(f"Nenhum arquivo encontrado na pasta raw para transformação.")
+            return None
+        
+        logger.info(f"Lendo arquivo: {latest_file}")
+
+        logger.info("Iniciando a transformação dos dados.")
+        df = pd.read_json(latest_file)
+        logger.info(f"Total de registros a serem transformados: {len(df)}")
+
+        df = df.drop(columns=['tags','dimensions', 'warrantyInformation',
+                            'returnPolicy', 'meta', 'images', 'thumbnail',], errors='ignore')
+        
+        output_file = TRUSTED_PATH / f"products_{datetime.now().strftime('%Y%m%d%H%M%S')}.parquet"
+
+        TRUSTED_PATH.mkdir(parents=True, exist_ok=True)
+
+        df.to_parquet(output_file, index=False)
+        logger.info(f"Transformação concluida e dados salvos em {output_file}, no formato parquet.")
+        return df
     
-    arquivos = list(pasta.glob('*.json'))
-    data_recent = max(arquivos, key=lambda f: f.stat().st_mtime)
-
-    return data_recent
-
-def transform_data(data):
-    df_bruto = pd.read_json(data) 
-    df = df_bruto.copy()
-
-    df = df.drop(columns=['tags','dimensions', 'warrantyInformation',
-                        'returnPolicy', 'meta', 'images', 'thumbnail',])
-
-    df.to_parquet(f'C:\\Users\\felip\\OneDrive\\Documentos\\Data_Pipeline_Ecommerce\\data\\trusted\\products_{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}.parquet', index=False)
-    return df
+    except Exception as e:
+        logger.exception("Erro durante a transformação dos dados.")
+        return None
 
 if __name__== "__main__":
-    transform_data(get_latest_raw_file())
+    transform_data()

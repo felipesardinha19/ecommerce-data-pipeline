@@ -1,1 +1,12 @@
-teste_ingestion.ipynb
+# data layers
+data/raw/
+data/trusted/
+data/analytics/
+
+# parquet files
+*.parquet
+*.json
+
+# logs
+*.log
+logs/

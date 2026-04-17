@@ -1,0 +1,66 @@
+version: "3.8"
+
+x-airflow-common: &airflow-common
+  image: apache/airflow:2.8.1
+  environment:
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    PYTHONPATH: /opt/airflow
+    _PIP_ADDITIONAL_REQUIREMENTS: requests-cache retry-requests
+  volumes:
+    - ./:/opt/airflow
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: airflow_postgres
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  airflow-init:
+    <<: *airflow-common
+    depends_on:
+      postgres:
+        condition: service_healthy
+    entrypoint: bash
+    command: >
+      -c "
+      airflow db migrate &&
+      airflow users create
+        --username admin
+        --password admin
+        --firstname Admin
+        --lastname User
+        --role Admin
+        --email admin@admin.com || true
+      "
+
+  airflow-webserver:
+    <<: *airflow-common
+    container_name: airflow-webserver
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+    ports:
+      - "8081:8080"
+    command: webserver
+
+  airflow-scheduler:
+    <<: *airflow-common
+    container_name: airflow-scheduler
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+    command: scheduler
+
+volumes:
+  postgres_data:

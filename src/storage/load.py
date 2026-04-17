@@ -2,7 +2,6 @@ from sqlalchemy import create_engine
 import pandas as pd
 from pathlib import Path
 from src.utils.logger import get_logger
-from src.utils.get_latest_file import get_latest_file
 from src.connection.postgres import get_engine
 import os
 
@@ -27,7 +26,7 @@ def get_latest_per_metric():
 
     return latest_files.values()
 
-def load():
+def load_data():
     try:
         connection = engine
         if connection is None:
@@ -48,7 +47,7 @@ def load():
             else:
                 continue
 
-            df.to_sql(table_name, con=engine, if_exists="replace", index=False)
+            df.to_sql(table_name, con=engine, if_exists="append", index=False)
 
             logger.info(f"{file} carregado em {table_name}")
 
@@ -56,4 +55,4 @@ def load():
         logger.exception(f"Erro ao carregar dados no banco: {e}")
     
 if __name__== "__main__":
-    load()
+    load_data()

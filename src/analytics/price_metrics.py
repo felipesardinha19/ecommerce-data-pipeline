@@ -14,8 +14,6 @@ def load_latest_parquet_file():
         return None
     return latest_file
 
-file = load_latest_parquet_file()
-
 def average_price_category(file):
     try:
         df = pd.read_parquet(file)
@@ -72,7 +70,7 @@ def price_discount_percentage(file):
         logger.info("Descontos calculados com sucesso!")
 
         #formatando df
-        df = df[['id', 'title', 'category', 'stock', 'brand', 'discount_value', 'final_price']]
+        df = df[['id', 'title', 'category', 'stock', 'brand', 'price', 'discount_value', 'final_price']]
         output_file = ANALYTICS_PATH / f"price_discount{pd.Timestamp.now().strftime('%y-%m-%d_%H-%M-%S')}.parquet"
 
         ANALYTICS_PATH.mkdir(parents=True, exist_ok=True)
@@ -85,10 +83,15 @@ def price_discount_percentage(file):
         logger.exception("Erro ao calcular preço com desconto")
         return None
 
-if __name__ == "__main__":
+def run_analytics():
     file = load_latest_parquet_file()
 
-    if file is not None:
-        average_price_category(file)
-        price_min_max_category(file)
-        price_discount_percentage(file)
+    if file is None:
+        logger.warning("Nenhum arquivo para processar no analytics.")
+        return
+
+    average_price_category(file)
+    price_min_max_category(file)
+    price_discount_percentage(file)
+
+    logger.info("Pipeline de analytics executado com sucesso.")

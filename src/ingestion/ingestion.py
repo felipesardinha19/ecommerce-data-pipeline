@@ -2,6 +2,9 @@ import json
 import requests_cache
 from retry_requests import retry
 from datetime import datetime
+from src.utils.logger import get_logger
+
+logger = get_logger("ingestion")
 
 # criar sessão com cache e retry
 cache_session = requests_cache.CachedSession('.cache', expire_after=3600)
@@ -14,20 +17,23 @@ def fetch_data():
         response = retry_session.get(url)
         response.raise_for_status()  # Verificar se a resposta foi bem-sucedida
         data = response.json()
-        print("Dados obtidos com sucesso!")
+        logger.info("Dados obtidos com sucesso!")
 
         return data['products']  # Retornar apenas a lista de produtos
     
     except requests_cache.exceptions.CacheError as e:
-        print(f"Erro de cache: {e}")
+        logger.exception(f"Erro de cache: {e}")
 
 def save_raw_data(data):
+    if data is None:
+        return
+    
     file_name = f"products_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.json"
 
     file_path = f"data/raw/{file_name}"
 
     with open(file_path, 'w') as f:
         json.dump(data, f, indent=4)
-    print(f"Dados salvos em {file_path}")
+    logger.info(f"Dados salvos em {file_path}")
 
-save_raw_data(fetch_data())
+    return file_path

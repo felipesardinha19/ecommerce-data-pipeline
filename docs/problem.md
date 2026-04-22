@@ -16,9 +16,13 @@ Os dados brutos não estão estruturados para análise, o que impede a geração
 - Não existe cálculo padronizado de descontos  
 - Dificuldade em entender o preço final real dos produtos  
 
-📊 3. Dificuldade para análise por categoria  
-- Não conseguem identificar produtos mais baratos ou mais caros  
-- Falta de comparação entre categorias  
+📊 3. Dificuldade para gerar insights estratégicos
+
+A empresa não conseguia responder perguntas como:
+
+- Qual o preço médio por categoria?
+- Qual a variação de preço (mín/máx) por categoria?
+- Qual o impacto de descontos nos produtos?
 
 🐢 4. Processo manual e não escalável  
 - Dados não tratados  

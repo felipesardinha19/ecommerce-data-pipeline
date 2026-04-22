@@ -10,11 +10,6 @@ webserver_config.py
 # Logs
 logs/
 
-# Data
-data/raw/
-data/trusted/
-data/analytics/
-
 # Env
 .env
 

@@ -1,41 +1,39 @@
-## 🏢 CONTEXTO
-
-Uma empresa de e-commerce em crescimento chamada UPBUY está expandindo suas operações digitais e passou a utilizar múltiplos sistemas para gerenciar pedidos, produtos e eventos da plataforma.
-
----
-
 ## 🚨 PROBLEMA
 
-Como não haviam um time de Engenheiros e Arquitetos de dados, perceberam que os dados estavam distribuídos em diferentes fontes (API e arquivos JSON), sem padronização e sem um pipeline estruturado, dificultando a análise e tomada de decisão.
+A empresa de e-commerce UPBUY possui dados de produtos provenientes de uma API, porém enfrenta dificuldades para extrair valor estratégico dessas informações.
+
+Os dados brutos não estão estruturados para análise, o que impede a geração de insights relacionados a precificação e desempenho de produtos.
 
 ---
 
 ## DORES DO NEGÓCIO 
 
-📉 1. Falta de confiabilidade nos dados
-Dados duplicados
-Campos inconsistentes
-Informações faltando
+📉 1. Falta de visibilidade sobre preços  
+- Não sabem a média de preços por categoria  
+- Não conseguem identificar variações de preço  
 
-🐢 2. Processo manual e lento
-Extração manual de dados
-Atualização não automatizada
+💸 2. Falta de controle sobre descontos  
+- Não existe cálculo padronizado de descontos  
+- Dificuldade em entender o preço final real dos produtos  
 
-🔄 3. Falta de integração entre fontes
-API → pedidos
-JSON → eventos/logs
-Banco → produtos
+📊 3. Dificuldade para análise por categoria  
+- Não conseguem identificar produtos mais baratos ou mais caros  
+- Falta de comparação entre categorias  
 
-Tudo separado, sem relacionamento
-
-📊 4. Dificuldade para gerar insights
-Não conseguem saber:
-total de vendas confiável
-produtos mais vendidos
-comportamento de compra
+🐢 4. Processo manual e não escalável  
+- Dados não tratados  
+- Sem automação  
+- Sem padronização  
 
 ---
 
 ## 🎯 OBJETIVO DO PROJETO
 
-Construir um pipeline de dados automatizado que centralize, trate e disponibilize os dados de forma confiável para análise.
+Construir um pipeline de dados automatizado que:
+
+- Estruture os dados de produtos  
+- Gere métricas analíticas relevantes  
+- Permita análise de preços e descontos por categoria  
+- Disponibilize os dados prontos para consumo em banco relacional  
+
+---

@@ -25,15 +25,16 @@ def fetch_data():
         logger.exception(f"Erro de cache: {e}")
 
 def save_raw_data(data):
-    if data is None:
-        return
-    
-    file_name = f"products_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.json"
+    if not data:
+        logger.warning("Nenhum dado recebido para salvar.")
+        return None
 
+    file_name = f"products_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.json"
     file_path = f"data/raw/{file_name}"
 
-    with open(file_path, 'w') as f:
+    with open(file_path, "w") as f:
         json.dump(data, f, indent=4)
+
     logger.info(f"Dados salvos em {file_path}")
 
     return file_path

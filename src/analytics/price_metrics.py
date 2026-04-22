@@ -2,17 +2,10 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 from src.utils.logger import get_logger
-from src.utils.get_latest_file import get_latest_file
+from datetime import datetime
 
 logger = get_logger("metrics")
 ANALYTICS_PATH = Path("data/analytics")
-
-def load_latest_parquet_file():
-    latest_file = get_latest_file(Path("data/trusted"), "*.parquet")
-    if not latest_file:
-        logger.warning("Nenhum arquivo encontrado.")
-        return None
-    return latest_file
 
 def average_price_category(file):
     try:
@@ -83,15 +76,41 @@ def price_discount_percentage(file):
         logger.exception("Erro ao calcular preço com desconto")
         return None
 
-def run_analytics():
-    file = load_latest_parquet_file()
+def save_metric(df, name):
+    ANALYTICS_PATH.mkdir(parents=True, exist_ok=True)
 
-    if file is None:
-        logger.warning("Nenhum arquivo para processar no analytics.")
-        return
+    output_file =  ANALYTICS_PATH / f"{name}_{datetime.now().strftime('%y-%m-%d_%H-%M-%S')}.parquet"
+    df.to_parquet(output_file, index=False)
 
-    average_price_category(file)
-    price_min_max_category(file)
-    price_discount_percentage(file)
+    logger.info(f"{name} salvo em {output_file}")
 
-    logger.info("Pipeline de analytics executado com sucesso.")
+    return str(output_file)
+
+def run_analytics(file_path):
+    try:
+        if not file_path:
+            logger.warning("Nenhum arquivo recebido para analytics.")
+            return None
+        
+        logger.info(f"Rodando analytics para: {file_path}")
+
+        df = pd.read_parquet(file_path)
+
+        avg_df = average_price_category(df.copy())
+        minmax_df = price_min_max_category(df.copy())
+        discount_df = price_discount_percentage(df.copy())
+
+        avg_path = save_metric(avg_df, "average_price_category")
+        minmax_path = save_metric(minmax_df, "price_min_max_category")
+        discount_path = save_metric(discount_df, "price_discount")
+
+        logger.info("Analytics executado com sucesso.")
+
+        return {
+            "average_price_category": avg_path,
+            "price_min_max_category": minmax_path,
+            "price_discount": discount_path
+        }
+
+    except Exception as e:
+        logger.exception(f"Erro ao processar analises: {e}")

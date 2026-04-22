@@ -1,4 +1,3 @@
-from sqlalchemy import create_engine
 import pandas as pd
 from pathlib import Path
 from src.utils.logger import get_logger
@@ -9,47 +8,31 @@ os.environ["PGCLIENTENCODING"] = "UTF8"
 
 logger = get_logger('load')
 
-engine = get_engine()
-
-def get_latest_per_metric():
-    files = list(Path("data/analytics").glob("*.parquet"))
-    latest_files = {}
-
-    for file in files:
-        metric_name = file.name.split("_")[0]  # ajuste se necessário
-
-        if metric_name not in latest_files:
-            latest_files[metric_name] = file
-        else:
-            if file.stat().st_mtime > latest_files[metric_name].stat().st_mtime:
-                latest_files[metric_name] = file
-
-    return latest_files.values()
-
-def load_data():
+def load_data(files_dict):
     try:
-        connection = engine
-        if connection is None:
+        if not files_dict:
+            logger.warning("Nenhum arquivo recebido para carga.")
+            return
+        
+        engine = get_engine()
+
+        if engine is None:
             logger.error("Falha ao conectar no banco.")
             return
 
-        files = get_latest_per_metric()
+        for table_name, file_path in files_dict.items():
+            logger.info(f"Carregando {file_path} na tabela {table_name}")
 
-        for file in files:
-            df = pd.read_parquet(file)
+            df = pd.read_parquet(file_path)
 
-            if "average_price_category" in file.name:
-                table_name = "average_price_category"
-            elif "price_min_max_category" in file.name:
-                table_name = "price_min_max_category"
-            elif "price_discount" in file.name:
-                table_name = "price_discount"
-            else:
-                continue
+            df.to_sql(table_name,
+                    con=engine,
+                    if_exists="append",
+                    index=False)
 
-            df.to_sql(table_name, con=engine, if_exists="append", index=False)
+            logger.info(f"Tabela {table_name}, carregada com sucesso.")
 
-            logger.info(f"{file} carregado em {table_name}")
+        logger.info("Carga finalizada com sucesso.")
 
     except Exception as e:
         logger.exception(f"Erro ao carregar dados no banco: {e}")

@@ -19,22 +19,23 @@ def etl_analytics():
     def extract():
         data = fetch_data()
         return save_raw_data(data)
-         
 
     @task
     def transform(file_path):
         return transform_data(file_path)
 
     @task
-    def analytics():
-        run_analytics()
+    def analytics(file_path):
+        return run_analytics(file_path)
 
     @task
-    def load():
-        load_data()
+    def load(file_dict):
+        load_data(file_dict)
 
-    path = extract()    
-    transform(path) >> analytics() >> load()
+    raw = extract()
+    trusted = transform(raw)
+    analytics_file = analytics(trusted)
+    load(analytics_file)
 
 
 etl_analytics()

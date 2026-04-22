@@ -1,14 +1,25 @@
-# data layers
+# Python
+__pycache__/
+*.pyc
+
+# Airflow
+airflow.cfg
+airflow-webserver.pid
+webserver_config.py
+
+# Logs
+logs/
+
+# Data
 data/raw/
 data/trusted/
 data/analytics/
 
-# parquet files
-*.parquet
-*.json
-
-# logs
-*.log
-logs/
-
+# Env
 .env
+
+# Cache
+.cache.sqlite
+
+# VSCode
+.vscode/

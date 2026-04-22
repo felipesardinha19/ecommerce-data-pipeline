@@ -24,6 +24,7 @@ def transform_data(input_file):
 
         df.to_parquet(output_file, index=False)
         logger.info(f"Transformação concluida e dados salvos em {output_file}, no formato parquet.")
+        
         return str(output_file)
     
     except Exception as e:

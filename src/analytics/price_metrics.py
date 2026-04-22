@@ -7,10 +7,8 @@ from datetime import datetime
 logger = get_logger("metrics")
 ANALYTICS_PATH = Path("data/analytics")
 
-def average_price_category(file):
+def average_price_category(df):
     try:
-        df = pd.read_parquet(file)
-
         #média de preço por categoria
         df['average_price_category'] = df.groupby('category')['price'].transform('mean').round(2)
         logger.info("Média de preço por categoria calculada com sucesso.")
@@ -30,10 +28,8 @@ def average_price_category(file):
         logger.exception("Erro ao calcular a média de preço por categoria: {e}.")
         return None
     
-def price_min_max_category(file):
+def price_min_max_category(df):
     try:
-        df = pd.read_parquet(file)
-
         #preço minimo e maximo por categoria
         df['price_min_category'] = df.groupby('category')['price'].transform('min').round(2)
         df['price_max_category'] = df.groupby('category')['price'].transform('max').round(2)
@@ -50,13 +46,11 @@ def price_min_max_category(file):
         return df
 
     except Exception as e:
-        logger.exception("Erro ao calcular o preço mínimo e máximo por categoria.")
+        logger.exception(f"Erro ao calcular o preço mínimo e máximo por categoria: {e}.")
         return None
     
-def price_discount_percentage(file):
+def price_discount_percentage(df):
     try:
-        df = pd.read_parquet(file)
-
         df['discount_value'] = (df['price'] * (df['discountPercentage'] / 100)).round(2)
         df['final_price'] = (df['price'] * ( 1 - df['discountPercentage'] / 100)).round(2)
 
@@ -73,10 +67,14 @@ def price_discount_percentage(file):
         return df
 
     except Exception as e:
-        logger.exception("Erro ao calcular preço com desconto")
+        logger.exception(f"Erro ao calcular preço com desconto: {e}")
         return None
 
 def save_metric(df, name):
+    if df is None:
+        logger.warning(f"{name} não gerado.")
+        return None
+    
     ANALYTICS_PATH.mkdir(parents=True, exist_ok=True)
 
     output_file =  ANALYTICS_PATH / f"{name}_{datetime.now().strftime('%y-%m-%d_%H-%M-%S')}.parquet"

@@ -28,3 +28,62 @@ Para mais detalhes sobre o projeto:
 - 🏗️ Arquitetura: docs/architecture.md
 - 👨🏽‍⚖️ Decisões técnicas: docs/decision.md
 - 🚨 Problema de negócio: docs/problem.md
+
+## 🗂️ Estrutura do Projeto
+```
+Data_Pipeline_Ecommerce/
+│
+├── config/                     # Configurações do pipeline
+│
+├── dags/                      # DAGs do Apache Airflow
+│   └── etl_analytics.py
+│
+├── data/
+│   ├── raw/                   # Dados brutos (ingestão)
+│   ├── trusted/               # Dados tratados/validados
+│   └── analytics/            # Dados prontos para análise
+│
+├── docs/                      # Documentação do projeto
+│   ├── architecture.md        # Arquitetura do pipeline
+│   ├── decision.md            # Decisões técnicas
+│   ├── problem.md             # Problema de negócio
+│   └── images/                # Diagramas e imagens
+│
+├── logs/                      # Logs do Airflow e pipeline
+│   ├── scheduler/
+│   ├── dag_processor_manager/
+│   ├── dag_id=etl_analytics/
+│   └── pipeline.log
+│
+├── src/                       # Código principal do projeto
+│   ├── analytics/             # Métricas e cálculos de negócio
+│   │   └── price_metrics.py
+│   │
+│   ├── connection/            # Conexão com banco de dados
+│   │   └── postgres.py
+│   │
+│   ├── ingestion/             # Camada de ingestão de dados
+│   │   └── ingestion.py
+│   │
+│   ├── processing/            # Transformações (ETL)
+│   │   └── transform.py
+│   │
+│   ├── storage/               # Carga de dados (load)
+│   │   └── load.py
+│   │
+│   └── utils/                 # Utilitários gerais
+│       ├── logger.py
+│       ├── helpers.py
+│       └── get_latest_file.py
+│
+├── .env                       # Variáveis de ambiente
+├── .env.example
+├── .gitignore
+│
+├── airflow.cfg               # Configuração do Airflow
+├── docker-compose.yml        # Orquestração do ambiente
+├── webserver_config.py       # Configuração web Airflow
+│
+├── requirements.txt
+└── README.md
+```
